@@ -1,0 +1,20 @@
+# Terraform generated
+.terraform/
+
+# Terraform state (never commit)
+terraform.tfstate
+terraform.tfstate.*
+*.tfstate
+*.tfstate.*
+
+# Terraform variable files with local/secrets (keep examples checked-in elsewhere if needed)
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Crash logs
+crash.log
+crash.*.log
+
+# CLI config (if created locally)
+.terraformrc
+terraform.rc
