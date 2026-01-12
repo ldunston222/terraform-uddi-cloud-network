@@ -27,21 +27,10 @@ module "uddi_cloud_network" {
   application = "test-app"
 }
 
-locals {
-  common_tags = {
-    Cloud        = "Azure"
-    Applictation = "test-app"
-    Environment  = "staging"
-    IpSpace      = "Cloud-Staging"
-    ManagedBy    = "terraform"
-  }
-}
-
 # Create resource group in Azure
 resource "azurerm_resource_group" "rg" {
   location = "westus"
   name     = "autotest-rg"
-  tags     = local.common_tags
 }
 
 # Use the Azure vnet module to create VNet and Subnets: https://registry.terraform.io/modules/Azure/vnet/azurerm/latest 
@@ -53,7 +42,6 @@ module "vnet" {
   use_for_each        = true
   vnet_location       = azurerm_resource_group.rg.location
   address_space       = [module.uddi_cloud_network.vpc_cidr]
-  tags                = local.common_tags
   subnet_prefixes     = [join("/", [module.uddi_cloud_network.subnet_address[0], module.uddi_cloud_network.subnet_cidr]), join("/", [module.uddi_cloud_network.subnet_address[1], module.uddi_cloud_network.subnet_cidr]), join("/", [module.uddi_cloud_network.subnet_address[2], module.uddi_cloud_network.subnet_cidr]), join("/", [module.uddi_cloud_network.subnet_address[3], module.uddi_cloud_network.subnet_cidr])] # Enter address input for each subnet - 2 for small, 4 for medium and large
   subnet_names        = ["subnet1", "subnet2", "subnet3", "subnet4"]                                                                                                                                                                                                                                                                                                                                                         # Enter names for each subnet - 2 for small, 4 for medium and large
 }

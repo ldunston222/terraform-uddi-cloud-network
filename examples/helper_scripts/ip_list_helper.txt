@@ -1,0 +1,2 @@
+curl -s -H "Authorization: Token $BLOXONE_API_KEY" \
+  "$BLOXONE_CSP_URL/api/ddi/v1/ipam/ip_space" | jq -r '.results[].name' | sort
