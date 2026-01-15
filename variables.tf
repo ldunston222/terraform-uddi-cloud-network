@@ -56,3 +56,33 @@ variable "subnet_size" {
   }
 }
 
+variable "subnet_extra_tags" {
+  description = "Optional: per-subnet additional tags applied by index (count order). If provided, must be empty or have exactly the same length as the number of subnets (2 for small, 4 otherwise)."
+  type        = list(map(string))
+  default     = []
+}
+
+variable "dns_zone_fqdn" {
+  description = "Optional: when set, create an authoritative DNS zone in BloxOne DDI (example: azure_dns_app_zone.example.internal)."
+  type        = string
+  default     = null
+}
+
+variable "dns_hostnames" {
+  description = "Optional: hostnames to create as A records inside dns_zone_fqdn (relative names, e.g. [\"app-01\", \"app-02\"]). If empty and dns_zone_fqdn is set, defaults to three hosts."
+  type        = list(string)
+  default     = []
+}
+
+variable "host_subnet_selector_tags" {
+  description = "When dns_zone_fqdn is set, these tags (merged with Cloud+Application) are used to select exactly one subnet to allocate host IPs from. Example: { Role = \"dns-hosts\" }."
+  type        = map(string)
+  default     = {}
+}
+
+variable "host_ip_start_offset" {
+  description = "When dns_zone_fqdn is set, allocate host IPs starting at this offset inside the selected subnet (cidrhost index). Default is 4 to avoid common cloud-reserved addresses (e.g., Azure reserves .0-.3)."
+  type        = number
+  default     = 4
+}
+

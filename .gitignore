@@ -7,13 +7,30 @@ terraform.tfstate.*
 *.tfstate
 *.tfstate.*
 
+# Terraform plan files
+tfplan
+*.tfplan
+
 # Terraform variable files with local/secrets (keep examples checked-in elsewhere if needed)
 *.auto.tfvars
 *.auto.tfvars.json
 
+# Keep example demo tfvars checked in
+!examples/**/demo.auto.tfvars
+!examples/**/demo.auto.tfvars.json
+
+# Avoid committing generated lockfiles under examples
+examples/**/.terraform.lock.hcl
+
 # Crash logs
 crash.log
 crash.*.log
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 
 # CLI config (if created locally)
 .terraformrc
