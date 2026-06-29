@@ -23,22 +23,69 @@ From the repo root:
 Provider authentication is environment-specific; one common pattern is using `BLOXONE_API_KEY` and `BLOXONE_CSP_URL` (see `examples/helper_scripts/ip_list_helper.txt`).
 
 ## Quickstart (auth + folder order)
-Terraform runs in the context of a folder (root module): it loads all `*.tf` in that directory. Most users should run the Azure demo from `examples/Azure/one-click/`, not from the repo root.
+Terraform runs in the context of a folder (root module): it loads all `*.tf` in that directory.
+
+Important architecture note:
+- The repo root is the reusable BloxOne allocation module.
+- The one-click cloud demos are separate root modules under `examples/*/one-click/`.
+- To run AWS + Azure + GCP one-click scenarios, run each wrapper root module (sequentially), rather than changing the repo-root module to orchestrate all three.
 
 1) Authenticate for BloxOne (shell environment variables)
 - `export BLOXONE_API_KEY='<your api key>'`
 - `export BLOXONE_CSP_URL='https://csp.infoblox.com'` (or your CSP base URL)
+
+Notes on variable names:
+- Some environments/tools use `CSP_API_KEY` / `CSP_URL` instead of `BLOXONE_API_KEY` / `BLOXONE_CSP_URL`.
+- This repo (and `infobloxopen/bloxone`) commonly use the `BLOXONE_*` names. If you only have `CSP_API_KEY` set, you can map it for Terraform:
+  - `export BLOXONE_API_KEY="${BLOXONE_API_KEY:-$CSP_API_KEY}"`
+  - `export BLOXONE_CSP_URL="${BLOXONE_CSP_URL:-${CSP_URL:-https://csp.infoblox.com}}"`
+
+Quick auth sanity check (should return `HTTP 200`):
+- `curl -sS -o /dev/null -w "HTTP %{http_code}\n" -H "Authorization: Token ${BLOXONE_API_KEY}" "${BLOXONE_CSP_URL%/}/api/ddi/v1/ipam/ip_space"`
+  - `401` usually means the token is missing/invalid.
+  - `403` usually means the token is valid but lacks permissions for the operation.
+
+Important: Terraform only sees environment variables exported in the same shell session (or configured in your terminal/CI environment).
 
 2) Authenticate for Azure (Azure CLI)
 - `az login`
 - Optional but recommended: `az account set --subscription '<subscription id>'`
 - If Terraform can’t infer the subscription: set `azure_subscription_id` in `examples/Azure/one-click/demo.auto.tfvars` or export `ARM_SUBSCRIPTION_ID`.
 
-3) Run Terraform from the folder you intend to apply
+3) Authenticate for AWS (AWS CLI)
+- `aws configure`
+or set environment variables:
+- `export AWS_ACCESS_KEY_ID='<your access key>'`
+- `export AWS_SECRET_ACCESS_KEY='<your secret key>'`
+- `export AWS_DEFAULT_REGION='us-west-2'`
+
+4) Authenticate for GCP (gcloud)
+- `gcloud auth application-default login`
+- `gcloud config set project '<your-gcp-project-id>'`
+
+5) Run Terraform from the folder you intend to apply
+- AWS “one-click” wrapper (allocates in BloxOne + creates AWS resources):
+  - `terraform -chdir=examples/AWS/one-click init`
+  - `terraform -chdir=examples/AWS/one-click plan`
+  - `terraform -chdir=examples/AWS/one-click apply`
 - Azure “one-click” wrapper (allocates in BloxOne + creates Azure resources):
   - `terraform -chdir=examples/Azure/one-click init`
   - `terraform -chdir=examples/Azure/one-click plan`
   - `terraform -chdir=examples/Azure/one-click apply`
+- GCP “one-click” wrapper (allocates in BloxOne + creates GCP resources):
+  - `terraform -chdir=examples/GCP/one-click init`
+  - `terraform -chdir=examples/GCP/one-click plan`
+  - `terraform -chdir=examples/GCP/one-click apply`
+
+To run all three one-click scenarios from repo root, execute:
+- `terraform -chdir=examples/AWS/one-click init && terraform -chdir=examples/AWS/one-click apply`
+- `terraform -chdir=examples/Azure/one-click init && terraform -chdir=examples/Azure/one-click apply`
+- `terraform -chdir=examples/GCP/one-click init && terraform -chdir=examples/GCP/one-click apply`
+
+Or use the helper script (sequentially runs AWS, Azure, then GCP one-click roots):
+- `./examples/helper_scripts/run-all-one-click.sh plan`
+- `./examples/helper_scripts/run-all-one-click.sh apply -- -auto-approve`
+- `./examples/helper_scripts/run-all-one-click.sh destroy -- -auto-approve`
 
 If you only want to allocate IPAM/DNS objects in BloxOne (no cloud resources), run Terraform from the repo root (this module) in a separate scratch/root module that calls it.
 
@@ -46,6 +93,10 @@ If you only want to allocate IPAM/DNS objects in BloxOne (no cloud resources), r
 This module should be used with VPC/VNet modules published by major cloud providers to allocate and provision VPCs/VNets in the cloud. See the subfolders under the examples folder for examples of use with some cloud providers.
 
 For an end-to-end Azure wrapper that allocates CIDRs in BloxOne and then creates the Azure Resource Group/VNet/Subnets, see `examples/Azure/one-click/`.
+
+For an end-to-end AWS wrapper that allocates CIDRs in BloxOne and then creates the VPC/Subnets (and optional demo EC2 instances), see `examples/AWS/one-click/`.
+
+For an end-to-end GCP wrapper that allocates CIDRs in BloxOne and then creates the VPC/Subnets (and optional demo GCE VMs), see `examples/GCP/one-click/`.
 
 ```hcl
 module "uddi_cloud_network" {

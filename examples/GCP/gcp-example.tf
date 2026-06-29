@@ -9,6 +9,9 @@ terraform {
   }
 }
 
+# Prefer the wrapper in examples/GCP/one-click/ for an end-to-end demo root module
+# with variables, outputs, docs, and optional GCE VM provisioning.
+
 provider "bloxone" {
   #For provider and authentication options for Infoblox, refer to: https://registry.terraform.io/providers/infobloxopen/infoblox/latest/docs
 }
