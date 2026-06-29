@@ -50,6 +50,26 @@ terraform -chdir=examples/GCP/one-click plan
 terraform -chdir=examples/GCP/one-click apply
 ```
 
+## Troubleshooting
+
+If you see:
+- `No IP Space found with name '...'`
+
+Then update `ip_space` in `demo.auto.tfvars` to an existing BloxOne IP space name (exact match).
+
+To list IP spaces quickly:
+```
+curl -sS -H "Authorization: Token ${BLOXONE_API_KEY}" \
+  "${BLOXONE_CSP_URL%/}/api/ddi/v1/ipam/ip_space" | jq -r '.[].name'
+```
+
+If you see:
+- `No parent container found ... with tag Cloud='GCP'`
+
+Either:
+- Keep `parent_pool_cidr` set in `demo.auto.tfvars` so Terraform creates the tagged parent pool, or
+- Create a parent pool manually in that IP space with tags `Cloud = GCP` and `Role = parent-pool`.
+
 ## Optional: demo GCE instances
 
 Set `gcp_vm_enabled = true` in `demo.auto.tfvars` to provision GCE instances with static private IPs
