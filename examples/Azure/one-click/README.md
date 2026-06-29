@@ -21,6 +21,13 @@ Recommended order (so auth works everywhere):
 - `export BLOXONE_API_KEY='<your api key>'`
 - `export BLOXONE_CSP_URL='https://csp.infoblox.com'` (or your CSP base URL)
 
+If your environment uses `CSP_API_KEY` / `CSP_URL`, map them like this before running Terraform:
+- `export BLOXONE_API_KEY="${BLOXONE_API_KEY:-$CSP_API_KEY}"`
+- `export BLOXONE_CSP_URL="${BLOXONE_CSP_URL:-${CSP_URL:-https://csp.infoblox.com}}"`
+
+Sanity check (should return `HTTP 200`):
+- `curl -sS -o /dev/null -w "HTTP %{http_code}\n" -H "Authorization: Token ${BLOXONE_API_KEY}" "${BLOXONE_CSP_URL%/}/api/ddi/v1/ipam/ip_space"`
+
 2) Azure auth (Azure CLI)
 - `az login`
 - Optional but recommended: `az account set --subscription '<subscription id>'`
