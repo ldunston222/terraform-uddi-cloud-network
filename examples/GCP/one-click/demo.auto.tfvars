@@ -4,7 +4,7 @@
 #   terraform apply
 
 # BloxOne IPAM inputs
-ip_space    = "gcp_ip_space_001"
+ip_space    = "Cloud-Staging"
 application = "ld_demo_vpc_001"
 size        = "large"
 
