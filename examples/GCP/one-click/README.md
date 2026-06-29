@@ -56,6 +56,7 @@ If you see:
 - `No IP Space found with name '...'`
 
 Then update `ip_space` in `demo.auto.tfvars` to an existing BloxOne IP space name (exact match).
+The sample value is intentionally a placeholder: `REPLACE_WITH_EXISTING_IP_SPACE_NAME`.
 
 To list IP spaces quickly:
 ```

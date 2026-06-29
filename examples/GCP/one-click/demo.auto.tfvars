@@ -4,7 +4,10 @@
 #   terraform apply
 
 # BloxOne IPAM inputs
-ip_space    = "Cloud-Staging"
+# Must match an existing BloxOne IP Space name exactly.
+# Example discovery command:
+# curl -sS -H "Authorization: Token ${BLOXONE_API_KEY}" "${BLOXONE_CSP_URL%/}/api/ddi/v1/ipam/ip_space" | jq -r '.[].name'
+ip_space    = "REPLACE_WITH_EXISTING_IP_SPACE_NAME"
 application = "ld_demo_vpc_001"
 size        = "large"
 
